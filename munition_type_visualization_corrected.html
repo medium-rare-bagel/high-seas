@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maritime Strikes: Munition Type Assessment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .chart-container {
+            position: relative;
+            height: 500px;
+            margin: 30px 0;
+        }
+        .methodology-note {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 30px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+        .methodology-note h3 {
+            margin-top: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .legend-note {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>US Maritime Strikes: Munition Type Assessment</h1>
+        <div class="subtitle">Analysis of 21 Strikes | September 2 - November 15, 2025</div>
+        
+        <div class="chart-container">
+            <canvas id="munitionChart"></canvas>
+        </div>
+        
+        <div class="legend-note">
+            * AGM-114 Hellfire/AGM-179 JAGM are assessed together as they produce similar visual effects and cannot be distinguished from video analysis alone.
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">21</div>
+                <div class="stat-label">Total Strikes<br>Analyzed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">71%</div>
+                <div class="stat-label">Strikes with Munition<br>Assessment</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">29%</div>
+                <div class="stat-label">Inconclusive<br>Assessments</div>
+            </div>
+        </div>
+
+        <div class="methodology-note">
+            <h3>Assessment Methodology</h3>
+            <p><strong>Important limitations:</strong> These assessments are based on remotely-viewed military footage without physical access to strike sites or munition remnants. Confidence levels vary by strike based on footage quality, explosion characteristics, and visible indicators.</p>
+            
+            <p><strong>Confidence categories:</strong></p>
+            <ul style="margin: 10px 0;">
+                <li><strong>High/Medium confidence:</strong> Multiple indicators present, adequate footage quality</li>
+                <li><strong>Low confidence:</strong> Limited evidence, single indicator, or partial footage</li>
+                <li><strong>Inconclusive:</strong> Impact moment cut from footage, extreme blurring, or insufficient quality</li>
+            </ul>
+            
+            <p><strong>Note on nomenclature:</strong> AGM-114 Hellfire and AGM-179 JAGM are listed together as "AGM-114 Hellfire/AGM-179 JAGM" because these weapons produce indistinguishable visual effects in thermal video footage.</p>
+            
+            <p style="margin-top: 15px; font-style: italic;">Analysis conducted by Joe Emmett, Explosive Weapons Expert, Airwars. November 21, 2025.</p>
+        </div>
+    </div>
+
+    <script>
+        // Data based on review of 21 strikes
+        const data = {
+            labels: [
+                'AGM-114 Hellfire/AGM-179 JAGM',
+                'APKWS (Advanced Precision Kill Weapon System)',
+                'AC-130J 40mm Cannon',
+                'Inconclusive/Insufficient Evidence'
+            ],
+            datasets: [{
+                data: [9, 6, 3, 6], // 9 Hellfire/JAGM, 6 APKWS, 3 Cannon (including 2-3 range), 6 inconclusive
+                backgroundColor: [
+                    '#e74c3c', // Red for Hellfire/JAGM
+                    '#f39c12', // Orange for APKWS
+                    '#3498db', // Blue for Cannon
+                    '#95a5a6'  // Gray for Inconclusive
+                ],
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        };
+
+        const config = {
+            type: 'pie',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 13
+                            },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const percentage = ((value / 21) * 100).toFixed(0);
+                                        return {
+                                            text: `${label} (${value} strikes, ${percentage}%)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = 21;
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return [
+                                    `${value} of ${total} strikes (${percentage}%)`,
+                                    '',
+                                    'Note: Confidence levels vary by strike'
+                                ];
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 12
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Munition Types Identified or Assessed',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            bottom: 30
+                        }
+                    }
+                }
+            }
+        };
+
+        // Create the chart
+        const ctx = document.getElementById('munitionChart').getContext('2d');
+        new Chart(ctx, config);
+    </script>
+</body>
+</html>
